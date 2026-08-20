@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VinUni AI Lab 20 — Multi-Agent Research Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <!-- App Container -->
+  <div class="app-layout">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-logo">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"></circle>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+          </svg>
+        </div>
+        <div>
+          <h1 class="brand-title">Multi-Agent Research Studio</h1>
+          <p class="brand-sub">VinUni AI Lab 20 · LangGraph Orchestration & Benchmark Engine</p>
+        </div>
+      </div>
+      <div class="header-badges">
+        <span class="badge badge-engine">⚡ LangGraph v1.2</span>
+        <span class="badge badge-corpus">📚 30 Topics Offline Corpus</span>
+        <span class="badge badge-status" id="system-status">🟢 Engine Ready</span>
+      </div>
+    </header>
+
+    <!-- Main Body Grid -->
+    <div class="main-body">
+      <!-- Sidebar Control Panel -->
+      <aside class="sidebar">
+        <div class="panel-section">
+          <label class="section-title" for="topic-select">🎯 Chọn chủ đề nghiên cứu mẫu</label>
+          <select id="topic-select" class="form-control">
+            <option value="">-- Chọn chủ đề từ Corpus 30 Topics --</option>
+          </select>
+        </div>
+
+        <div class="panel-section">
+          <label class="section-title" for="query-input">📝 Câu hỏi / Yêu cầu nghiên cứu</label>
+          <textarea id="query-input" class="form-control query-textarea" rows="4" placeholder="Nhập câu hỏi nghiên cứu hoặc chọn từ danh sách mẫu...">Research GraphRAG state-of-the-art and write a 500-word summary</textarea>
+        </div>
+
+        <div class="panel-section grid-2-col">
+          <div>
+            <label class="section-title" for="max-sources">Tài liệu tối đa</label>
+            <div class="slider-container">
+              <input type="range" id="max-sources" min="1" max="10" value="5" class="slider">
+              <span id="sources-val" class="slider-val">5</span>
+            </div>
+          </div>
+          <div>
+            <label class="section-title" for="audience-select">Đối tượng độc giả</label>
+            <select id="audience-select" class="form-control">
+              <option value="technical learners">Technical Learners</option>
+              <option value="AI researchers">AI Researchers</option>
+              <option value="executive leaders">Executive Leaders</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <label class="checkbox-container">
+            <input type="checkbox" id="critic-toggle">
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Kích hoạt Critic Agent (Fact-Check & Audit)</span>
+          </label>
+        </div>
+
+        <div class="panel-actions">
+          <button id="btn-run-multi" class="btn btn-primary">
+            <span>🚀 Chạy Multi-Agent Workflow</span>
+          </button>
+          <button id="btn-run-baseline" class="btn btn-secondary">
+            <span>⚡ Chạy Single-Agent Baseline</span>
+          </button>
+          <button id="btn-run-benchmark" class="btn btn-tertiary">
+            <span>📊 Chạy Benchmark So Sánh</span>
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Workspace -->
+      <main class="workspace">
+        <!-- Navigation Tabs -->
+        <nav class="nav-tabs">
+          <button class="tab-btn active" data-tab="studio-tab">🧭 Orchestration Studio</button>
+          <button class="tab-btn" data-tab="arena-tab">⚔️ Arena: Single vs Multi</button>
+          <button class="tab-btn" data-tab="benchmark-tab">📈 Benchmark Analytics</button>
+        </nav>
+
+        <!-- Tab 1: Studio -->
+        <div id="studio-tab" class="tab-content active">
+          <!-- Visual Workflow Graph -->
+          <div class="card graph-card">
+            <div class="card-header">
+              <h3>Đồ thị Điều phối Đa Tác tử (LangGraph State Graph)</h3>
+              <span id="graph-state-badge" class="state-badge">Waiting</span>
+            </div>
+            <div class="graph-visualizer" id="graph-visualizer">
+              <div class="node-item" id="node-start">
+                <div class="node-icon">🚀</div>
+                <div class="node-title">START</div>
+              </div>
+              <div class="node-connector" id="edge-start-sup"></div>
+              
+              <div class="node-item node-supervisor" id="node-supervisor">
+                <div class="node-icon">🧭</div>
+                <div class="node-title">Supervisor</div>
+                <div class="node-sub">Routing & Guards</div>
+              </div>
+              
+              <div class="workers-cluster">
+                <div class="node-item" id="node-researcher">
+                  <div class="node-icon">🔍</div>
+                  <div class="node-title">Researcher</div>
+                  <div class="node-sub">Corpus Search</div>
+                </div>
+                <div class="node-item" id="node-analyst">
+                  <div class="node-icon">🧠</div>
+                  <div class="node-title">Analyst</div>
+                  <div class="node-sub">Trade-offs</div>
+                </div>
+                <div class="node-item" id="node-writer">
+                  <div class="node-icon">✍️</div>
+                  <div class="node-title">Writer</div>
+                  <div class="node-sub">Citations & Draft</div>
+                </div>
+                <div class="node-item node-critic" id="node-critic" style="display:none;">
+                  <div class="node-icon">🛡️</div>
+                  <div class="node-title">Critic</div>
+                  <div class="node-sub">Audit & Fact-Check</div>
+                </div>
+              </div>
+
+              <div class="node-connector" id="edge-done"></div>
+              <div class="node-item" id="node-done">
+                <div class="node-icon">🏁</div>
+                <div class="node-title">END</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Metrics HUD -->
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <div class="metric-label">⏱️ Latency</div>
+              <div class="metric-value" id="hud-latency">--</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">💰 Estimated Cost</div>
+              <div class="metric-value" id="hud-cost">--</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">⭐ Quality Score</div>
+              <div class="metric-value" id="hud-quality">--</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">📎 Citation Coverage</div>
+              <div class="metric-value" id="hud-citation">--</div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-label">🔄 Handoff Hops</div>
+              <div class="metric-value" id="hud-hops">--</div>
+            </div>
+          </div>
+
+          <!-- Result Inspection Card -->
+          <div class="card result-card">
+            <div class="card-tabs">
+              <button class="subtab-btn active" data-subtab="final-ans-view">📄 Báo Cáo Tổng Hợp</button>
+              <button class="subtab-btn" data-subtab="analysis-notes-view">🧠 Analyst Notes</button>
+              <button class="subtab-btn" data-subtab="research-notes-view">🔍 Research Sources</button>
+              <button class="subtab-btn" data-subtab="trace-view">⏱️ Raw Execution Trace</button>
+            </div>
+            <div class="subtab-content active" id="final-ans-view">
+              <div class="markdown-body" id="final-answer-content">
+                <div class="placeholder-box">Chưa có kết quả. Bấm "Chạy Multi-Agent Workflow" để bắt đầu.</div>
+              </div>
+            </div>
+            <div class="subtab-content" id="analysis-notes-view">
+              <div class="markdown-body" id="analysis-notes-content"></div>
+            </div>
+            <div class="subtab-content" id="research-notes-view">
+              <div class="sources-list" id="sources-list-content"></div>
+            </div>
+            <div class="subtab-content" id="trace-view">
+              <pre class="json-code-block" id="trace-json-content"></pre>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Arena -->
+        <div id="arena-tab" class="tab-content">
+          <div class="arena-grid">
+            <div class="card arena-card">
+              <div class="card-header">
+                <h3>⚡ Single-Agent Baseline</h3>
+                <span class="badge badge-baseline">1-Shot Direct Prompting</span>
+              </div>
+              <div class="arena-metrics" id="arena-baseline-metrics">
+                <span class="metric-pill">Latency: <b id="ab-lat">--</b></span>
+                <span class="metric-pill">Cost: <b id="ab-cost">--</b></span>
+                <span class="metric-pill">Citation: <b id="ab-cite">0%</b></span>
+              </div>
+              <div class="markdown-body arena-content" id="arena-baseline-content">
+                <div class="placeholder-box">Chưa chạy baseline.</div>
+              </div>
+            </div>
+
+            <div class="card arena-card">
+              <div class="card-header">
+                <h3>🚀 Multi-Agent Workflow</h3>
+                <span class="badge badge-multi">Supervisor + Workers (LangGraph)</span>
+              </div>
+              <div class="arena-metrics" id="arena-multi-metrics">
+                <span class="metric-pill">Latency: <b id="am-lat">--</b></span>
+                <span class="metric-pill">Cost: <b id="am-cost">--</b></span>
+                <span class="metric-pill">Citation: <b id="am-cite">--</b></span>
+                <span class="metric-pill">Quality: <b id="am-qual">--</b></span>
+              </div>
+              <div class="markdown-body arena-content" id="arena-multi-content">
+                <div class="placeholder-box">Chưa chạy multi-agent.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 3: Benchmark -->
+        <div id="benchmark-tab" class="tab-content">
+          <div class="card">
+            <div class="card-header">
+              <h3>Bảng Đối Chuẩn Hiệu Năng Đa Chiều (Benchmark Suite)</h3>
+              <button id="btn-re-benchmark" class="btn btn-sm btn-primary">Chạy lại Benchmark</button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table" id="benchmark-table">
+                <thead>
+                  <tr>
+                    <th>Run Name</th>
+                    <th>Latency (s)</th>
+                    <th>Cost (USD)</th>
+                    <th>Quality Score</th>
+                    <th>Citation Coverage</th>
+                    <th>Failure Rate</th>
+                    <th>Execution Notes</th>
+                  </tr>
+                </thead>
+                <tbody id="benchmark-tbody">
+                  <tr><td colspan="7" style="text-align:center;">Bấm nút "Chạy Benchmark So Sánh" để bắt đầu.</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
